@@ -1,0 +1,100 @@
+{% extends "admin/base.html" %}
+{% block title %}Conexiones{% endblock %}
+{% block page_title %}Gestión de Conexiones{% endblock %}
+
+{% block content %}
+<!-- Add Connection Form -->
+<div class="card" style="margin-bottom: 1.5rem;">
+    <div class="section-header"><h2>Añadir Conexión</h2></div>
+    <form method="POST" action="{{ url_for('admin.connection_add') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+            <div class="form-group">
+                <label>Candidato *</label>
+                <select name="candidate_id" required>
+                    <option value="">— Seleccionar —</option>
+                    {% for c in candidates %}
+                    <option value="{{ c.id }}">{{ c.name }} ({{ c.party or 'Ind.' }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tipo *</label>
+                <select name="connection_type" required>
+                    {% for t in connection_types %}
+                    <option value="{{ t }}">{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Organización</label>
+                <input type="text" name="organization" maxlength="200" placeholder="Nombre...">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Descripción</label>
+            <textarea name="description" rows="2" placeholder="Detalles sobre la conexión..."></textarea>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" name="verified"> Marcar como verificada
+            </label>
+            <button type="submit" class="btn btn-primary">Añadir Conexión</button>
+        </div>
+    </form>
+</div>
+
+<!-- Connections Table -->
+{% if connections %}
+<div class="card" style="padding: 0;">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Candidato</th>
+                    <th>Tipo</th>
+                    <th>Organización</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conn in connections %}
+                <tr>
+                    <td style="color: var(--gray-400);">{{ conn.id }}</td>
+                    <td><strong style="color: var(--navy-700);">{{ conn.candidate.name }}</strong></td>
+                    <td>
+                        <span class="badge {{ 'badge-rejected' if conn.connection_type in ('criminal_organization', 'narcotics') else 'badge-neutral' }}">
+                            {{ conn.connection_type }}
+                        </span>
+                    </td>
+                    <td>{{ conn.organization or '—' }}</td>
+                    <td>
+                        {% if conn.verified %}
+                        <span class="badge badge-verified">✓ Verificada</span>
+                        {% else %}
+                        <span class="badge badge-pending">Sin verificar</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.connection_verify', conn_id=conn.id) }}" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn {{ 'btn-warning' if conn.verified else 'btn-success' }} btn-sm">
+                                {{ 'Des-verificar' if conn.verified else 'Verificar' }}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem; color: var(--gray-400);">
+    <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔗</p>
+    <p>No hay conexiones registradas.</p>
+</div>
+{% endif %}
+{% endblock %}

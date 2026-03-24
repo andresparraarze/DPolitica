@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión — Admin DPolitica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b1628;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .login-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .login-card .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .login-card .brand-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #4a7ec7, #c6d9f1);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.875rem;
+            color: #0b1628;
+            margin-bottom: 1rem;
+        }
+        .login-card h1 { font-size: 1.5rem; font-weight: 800; color: #0b1628; letter-spacing: -0.02em; }
+        .login-card p { font-size: 0.875rem; color: #6b7589; margin-top: 0.5rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.875rem; font-weight: 600; color: #3a4150; margin-bottom: 0.5rem; }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cdd3df;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .form-group input:focus { border-color: #1e3a75; box-shadow: 0 0 0 3px rgba(30,58,117,0.08); }
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #152952;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn:hover { background: #1b3568; }
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        .alert-error { background: #fde8e8; color: #b91c1c; }
+        .alert-success { background: #d1fae5; color: #059669; }
+        .alert-info { background: #dbeafe; color: #1e3a75; }
+        .back-link { display: block; text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: #6b7589; text-decoration: none; }
+        .back-link:hover { color: #1e3a75; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="brand">
+            <div class="brand-icon">DP</div>
+            <h1>Panel de Administración</h1>
+            <p>DPolitica — Transparencia Política</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="password">Contraseña de Administrador</label>
+                <input type="password" id="password" name="password" placeholder="Introduce la contraseña" autofocus required>
+            </div>
+            <button type="submit" class="btn">Iniciar Sesión</button>
+        </form>
+
+        <a href="{{ url_for('index') }}" class="back-link">← Volver al sitio público</a>
+    </div>
+</body>
+</html>

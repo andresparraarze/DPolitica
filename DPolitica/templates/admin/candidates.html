@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% block title %}Candidatos{% endblock %}
+{% block page_title %}Gestión de Candidatos{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <h2>{{ candidates|length }} candidato{{ 's' if candidates|length != 1 }}</h2>
+    <a href="{{ url_for('admin.candidate_new') }}" class="btn btn-primary">+ Nuevo Candidato</a>
+</div>
+
+{% if candidates %}
+<div class="card" style="padding: 0;">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Partido</th>
+                    <th>Conexiones</th>
+                    <th>Creado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in candidates %}
+                <tr>
+                    <td style="color: var(--gray-400);">{{ c.id }}</td>
+                    <td><strong style="color: var(--navy-700);">{{ c.name }}</strong></td>
+                    <td><span class="badge badge-neutral">{{ c.party or '—' }}</span></td>
+                    <td>{{ c.connection_count }}</td>
+                    <td style="font-size: 0.8rem; color: var(--gray-400);">{{ c.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td style="white-space: nowrap;">
+                        <a href="{{ url_for('admin.candidate_edit', cid=c.id) }}" class="btn btn-secondary btn-sm">Editar</a>
+                        <form method="POST" action="{{ url_for('admin.candidate_delete', cid=c.id) }}" style="display: inline;" onsubmit="return confirm('¿Eliminar a {{ c.name }}? Esta acción no se puede deshacer.');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem; color: var(--gray-400);">
+    <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">👤</p>
+    <p>No hay candidatos registrados.</p>
+    <a href="{{ url_for('admin.candidate_new') }}" class="btn btn-primary" style="margin-top: 1rem;">Crear Primer Candidato</a>
+</div>
+{% endif %}
+{% endblock %}

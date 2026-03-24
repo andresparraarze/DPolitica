@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin{% endblock %} — DPolitica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --navy-900: #0b1628; --navy-800: #0f1f3d; --navy-700: #152952; --navy-600: #1b3568;
+            --navy-500: #1e3a75; --navy-400: #2d5aa0; --navy-300: #4a7ec7; --navy-200: #8db3e3;
+            --navy-100: #c6d9f1; --navy-50: #eaf1fb;
+            --white: #fff; --gray-50: #f8f9fb; --gray-100: #f1f3f7; --gray-200: #e2e6ee;
+            --gray-300: #cdd3df; --gray-400: #9aa3b5; --gray-500: #6b7589; --gray-600: #4e5668;
+            --gray-700: #3a4150; --gray-800: #272d3a;
+            --red-50: #fef2f2; --red-100: #fde8e8; --red-500: #dc2626; --red-600: #b91c1c;
+            --amber-50: #fffbeb; --amber-100: #fef3c7; --amber-500: #f59e0b;
+            --green-50: #ecfdf5; --green-100: #d1fae5; --green-500: #10b981; --green-600: #059669;
+            --blue-50: #eff6ff; --blue-100: #dbeafe;
+            --font: 'Inter', -apple-system, sans-serif;
+            --radius: 8px;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font); background: var(--gray-50); color: var(--gray-700); display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: var(--navy-900);
+            color: var(--gray-300);
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            overflow-y: auto;
+        }
+        .sidebar-brand {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .sidebar-brand .icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--navy-300), var(--navy-100));
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.75rem; color: var(--navy-900);
+        }
+        .sidebar-brand span { font-weight: 700; font-size: 0.95rem; color: var(--white); }
+        .sidebar-brand small { font-size: 0.65rem; color: var(--gray-400); margin-left: auto; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 99px; }
+        .sidebar-nav { padding: 1rem 0.75rem; flex: 1; }
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: 0.6rem;
+            padding: 0.6rem 0.75rem; border-radius: 6px;
+            font-size: 0.875rem; font-weight: 500; color: var(--gray-400);
+            text-decoration: none; transition: all 0.15s; margin-bottom: 2px;
+        }
+        .sidebar-nav a:hover { background: rgba(255,255,255,0.06); color: var(--white); }
+        .sidebar-nav a.active { background: var(--navy-700); color: var(--white); }
+        .sidebar-nav a .icon { font-size: 1rem; width: 20px; text-align: center; }
+        .sidebar-nav .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 0.75rem 0; }
+        .sidebar-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .sidebar-footer a {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-size: 0.8rem; color: var(--gray-400); text-decoration: none;
+        }
+        .sidebar-footer a:hover { color: var(--red-500); }
+
+        /* Main area */
+        .admin-main { margin-left: 240px; flex: 1; min-height: 100vh; }
+
+        /* Top bar */
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0.75rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 40;
+        }
+        .topbar h1 { font-size: 1.125rem; font-weight: 700; color: var(--navy-800); }
+        .topbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .topbar-actions a {
+            font-size: 0.8rem; color: var(--gray-500); text-decoration: none;
+            padding: 0.4rem 0.75rem; border-radius: 6px; transition: all 0.15s;
+        }
+        .topbar-actions a:hover { background: var(--gray-100); color: var(--navy-700); }
+
+        /* Content area */
+        .admin-content { padding: 2rem; max-width: 1200px; }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { text-align: center; padding: 1.5rem 1rem; }
+        .stat-card .number { font-size: 2rem; font-weight: 900; color: var(--navy-700); letter-spacing: -0.02em; }
+        .stat-card .label { font-size: 0.8rem; color: var(--gray-500); margin-top: 0.25rem; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.5rem 1rem; font-family: var(--font); font-size: 0.8rem; font-weight: 600;
+            border-radius: 6px; border: none; cursor: pointer; transition: all 0.15s;
+            text-decoration: none; line-height: 1.4;
+        }
+        .btn-primary { background: var(--navy-700); color: var(--white); }
+        .btn-primary:hover { background: var(--navy-600); color: var(--white); }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
+        .btn-secondary:hover { background: var(--gray-200); }
+        .btn-success { background: var(--green-500); color: var(--white); }
+        .btn-success:hover { background: var(--green-600); }
+        .btn-danger { background: var(--red-500); color: var(--white); }
+        .btn-danger:hover { background: var(--red-600); }
+        .btn-warning { background: var(--amber-500); color: var(--white); }
+        .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.75rem; }
+
+        /* Badges */
+        .badge {
+            display: inline-flex; padding: 2px 8px; border-radius: 99px;
+            font-size: 0.7rem; font-weight: 600;
+        }
+        .badge-pending { background: var(--amber-100); color: var(--amber-500); }
+        .badge-verified { background: var(--green-100); color: var(--green-600); }
+        .badge-rejected { background: var(--red-100); color: var(--red-600); }
+        .badge-review { background: var(--blue-100); color: var(--navy-500); }
+        .badge-neutral { background: var(--gray-100); color: var(--gray-600); }
+
+        /* Tables */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        th { text-align: left; padding: 0.6rem 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--gray-200); }
+        td { padding: 0.75rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); vertical-align: top; }
+        tr:hover td { background: var(--gray-50); }
+
+        /* Forms */
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--gray-600); margin-bottom: 0.35rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--gray-300); border-radius: 6px;
+            font-family: var(--font); font-size: 0.875rem; outline: none;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--navy-400); box-shadow: 0 0 0 3px rgba(30,58,117,0.06);
+        }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        /* Inline form */
+        .inline-form { display: flex; gap: 0.5rem; align-items: flex-end; flex-wrap: wrap; }
+        .inline-form .form-group { margin-bottom: 0; }
+
+        /* Alerts */
+        .alert { padding: 0.75rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; font-size: 0.85rem; font-weight: 500; }
+        .alert-success { background: var(--green-50); color: var(--green-600); border: 1px solid var(--green-100); }
+        .alert-error { background: var(--red-50); color: var(--red-600); border: 1px solid var(--red-100); }
+        .alert-info { background: var(--blue-50); color: var(--navy-600); border: 1px solid var(--blue-100); }
+
+        /* Log list */
+        .log-list { list-style: none; }
+        .log-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.8rem;
+            display: flex; gap: 0.75rem; align-items: baseline;
+        }
+        .log-list .log-time { color: var(--gray-400); font-size: 0.75rem; white-space: nowrap; flex-shrink: 0; }
+        .log-list .log-action { font-weight: 600; color: var(--navy-600); }
+
+        /* Section title */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .section-header h2 { font-size: 1rem; font-weight: 700; color: var(--navy-800); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar-brand span, .sidebar-brand small, .sidebar-nav a span:not(.icon), .sidebar-footer a span { display: none; }
+            .sidebar-nav a { justify-content: center; padding: 0.75rem; }
+            .admin-main { margin-left: 60px; }
+            .admin-content { padding: 1rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .topbar { padding: 0.75rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="icon">DP</div>
+            <span>DPolitica</span>
+            <small>Admin</small>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint == 'admin.dashboard' }}">
+                <span class="icon">📊</span> <span>Panel</span>
+            </a>
+            <a href="{{ url_for('admin.submissions') }}" class="{{ 'active' if 'submission' in request.endpoint }}">
+                <span class="icon">📝</span> <span>Denuncias</span>
+            </a>
+            <div class="divider"></div>
+            <a href="{{ url_for('admin.candidates_list') }}" class="{{ 'active' if 'candidate' in request.endpoint }}">
+                <span class="icon">👤</span> <span>Candidatos</span>
+            </a>
+            <a href="{{ url_for('admin.connections_list') }}" class="{{ 'active' if 'connection' in request.endpoint }}">
+                <span class="icon">🔗</span> <span>Conexiones</span>
+            </a>
+            <a href="{{ url_for('admin.sources_list') }}" class="{{ 'active' if 'source' in request.endpoint }}">
+                <span class="icon">📄</span> <span>Fuentes</span>
+            </a>
+            <div class="divider"></div>
+            <a href="{{ url_for('index') }}">
+                <span class="icon">🌐</span> <span>Sitio Público</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('admin.logout') }}">
+                <span>🚪</span> <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="admin-main">
+        <header class="topbar">
+            <h1>{% block page_title %}Panel de Administración{% endblock %}</h1>
+            <div class="topbar-actions">
+                <a href="{{ url_for('admin.logout') }}" style="color: var(--red-500);">Cerrar Sesión</a>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

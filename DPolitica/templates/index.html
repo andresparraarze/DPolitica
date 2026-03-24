@@ -1,62 +1,108 @@
 {% extends "base.html" %}
 
-{% block title %}DPolitica - Transparencia Política Bolivia{% endblock %}
+{% block title %}DPolitica — Transparencia Política Bolivia{% endblock %}
 
 {% block content %}
-<div style="text-align: center; margin-bottom: 2rem;">
-    <h1 style="color: #1a365d; font-size: 2.5rem; margin-bottom: 1rem;">DPolitica</h1>
-    <h2 style="color: #666; font-size: 1.5rem; margin-bottom: 2rem;">Transparencia Política para Bolivia</h2>
-    <p style="max-width: 700px; margin: 0 auto 2rem; font-size: 1.1rem; color: #555;">
-        Accede a información verificada sobre candidatos políticos bolivianos:
-        antecedentes, conexiones criminales, financiamiento y más.
-        Conoce el verdadero pasado de quienes buscan el poder.
-    </p>
-    <div style="display: flex; gap: 1rem; justify-content: center;">
-        <a href="{{ url_for('candidates') }}" class="btn btn-primary">Ver Candidatos</a>
-        <a href="{{ url_for('submit') }}" class="btn btn-secondary">Enviar Información Anónima</a>
+<!-- Hero Section -->
+<div style="background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%); margin-top: -2rem; padding: var(--space-20) 0; position: relative; overflow: hidden;">
+    <div style="position: absolute; inset: 0; background: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><defs><pattern id=%22g%22 width=%2220%22 height=%2220%22 patternUnits=%22userSpaceOnUse%22><circle cx=%221%22 cy=%221%22 r=%220.6%22 fill=%22rgba(255,255,255,0.03)%22/></pattern></defs><rect fill=%22url(%23g)%22 width=%22100%22 height=%22100%22/></svg>');"></div>
+    <div class="container" style="position: relative; z-index: 1;">
+        <div style="max-width: 640px;">
+            <div style="display: inline-flex; align-items: center; gap: var(--space-2); background: rgba(255,255,255,0.08); padding: var(--space-1) var(--space-4) var(--space-1) var(--space-2); border-radius: var(--radius-full); margin-bottom: var(--space-6); font-size: var(--text-sm); color: var(--navy-200); border: 1px solid rgba(255,255,255,0.08);">
+                <span style="background: var(--green-500); width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                Plataforma ciudadana activa
+            </div>
+            <h1 style="font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; color: var(--white); line-height: 1.15; letter-spacing: -0.03em; margin-bottom: var(--space-5);">
+                Conoce el verdadero pasado de quienes buscan el poder
+            </h1>
+            <p style="font-size: var(--text-lg); color: var(--navy-200); line-height: 1.7; margin-bottom: var(--space-8); max-width: 540px;">
+                Información verificada sobre candidatos políticos bolivianos: antecedentes, conexiones, financiamiento y denuncias ciudadanas. Porque la transparencia es tu derecho.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: var(--space-3);">
+                <a href="{{ url_for('candidates') }}" class="btn btn-lg" style="background: var(--white); color: var(--navy-800); font-weight: 700;">
+                    Ver Candidatos →
+                </a>
+                <a href="{{ url_for('submit') }}" class="btn btn-lg" style="background: rgba(255,255,255,0.1); color: var(--white); border: 1px solid rgba(255,255,255,0.15);">
+                    🔒 Enviar Denuncia Anónima
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-number">{{ total_candidates }}</div>
-        <div class="stat-label">Candidatos Registrados</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-number">{{ total_submissions }}</div>
-        <div class="stat-label">Denuncias Recibidas</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-number">{{ verified_submissions }}</div>
-        <div class="stat-label">Información Verificada</div>
+<!-- Stats Section -->
+<div class="container" style="margin-top: calc(-1 * var(--space-10)); position: relative; z-index: 2;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+        <div class="card" style="text-align: center; padding: var(--space-6) var(--space-4);">
+            <div style="font-size: var(--text-3xl); font-weight: 900; color: var(--navy-700); letter-spacing: -0.02em;">{{ total_candidates }}</div>
+            <div style="font-size: var(--text-sm); color: var(--gray-500); margin-top: var(--space-1);">Candidatos Registrados</div>
+        </div>
+        <div class="card" style="text-align: center; padding: var(--space-6) var(--space-4);">
+            <div style="font-size: var(--text-3xl); font-weight: 900; color: var(--navy-700); letter-spacing: -0.02em;">{{ total_submissions }}</div>
+            <div style="font-size: var(--text-sm); color: var(--gray-500); margin-top: var(--space-1);">Denuncias Recibidas</div>
+        </div>
+        <div class="card" style="text-align: center; padding: var(--space-6) var(--space-4);">
+            <div style="font-size: var(--text-3xl); font-weight: 900; color: var(--navy-700); letter-spacing: -0.02em;">{{ verified_submissions }}</div>
+            <div style="font-size: var(--text-sm); color: var(--gray-500); margin-top: var(--space-1);">Información Verificada</div>
+        </div>
     </div>
 </div>
 
-<h2 style="color: #1a365d; margin: 2rem 0 1rem;">Candidatos Destacados</h2>
+<!-- Featured Candidates -->
+<div class="container" style="margin-top: var(--space-12);">
+    <h2 class="section-title">Candidatos Destacados</h2>
+    <p class="section-subtitle">Perfiles recientes y de alto interés público</p>
 
-{% if featured %}
-    {% for candidate in featured %}
-    <div class="card">
-        <h3 style="color: #1a365d;">{{ candidate.name }}</h3>
-        <p style="color: #666;">Partido: {{ candidate.party or 'Independiente' }}</p>
-        <p style="margin-top: 0.5rem;">{{ candidate.background_summary or 'Sin resumen disponible' }}</p>
-        {% if candidate.connection_count %}
-        <p style="margin-top: 0.5rem;">
-            <span class="badge badge-unverified">{{ candidate.connection_count }} conexiones reportadas</span>
+    {% if featured %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-4);">
+        {% for candidate in featured %}
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-3);">
+                    <div>
+                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--navy-800); margin-bottom: var(--space-1);">{{ candidate.name }}</h3>
+                        <span style="font-size: var(--text-sm); color: var(--gray-500);">{{ candidate.party or 'Independiente' }}</span>
+                    </div>
+                    {% set conn_count = candidate.connection_count %}
+                    {% if conn_count %}
+                    <div class="severity-bar level-{{ [conn_count, 5]|min }}">
+                        <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+                    </div>
+                    {% endif %}
+                </div>
+                <p style="font-size: var(--text-sm); color: var(--gray-600); line-height: 1.6; margin-bottom: var(--space-4);">{{ candidate.background_summary or 'Sin resumen disponible' }}</p>
+                {% if candidate.criminal_connections %}
+                <span class="badge badge-criminal">🚨 Conexiones criminales reportadas</span>
+                {% elif conn_count %}
+                <span class="badge badge-warning">{{ conn_count }} conexiones reportadas</span>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('candidate_detail', candidate_id=candidate.id) }}" class="btn btn-secondary" style="margin-top: var(--space-5); width: 100%;">
+                Ver Perfil Completo
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <h3>Sin candidatos destacados</h3>
+        <p>Aún no hay candidatos registrados. {{ total_candidates }} candidato(s) disponible(s).</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- CTA Section -->
+<div class="container" style="margin-top: var(--space-12);">
+    <div class="card" style="background: linear-gradient(135deg, var(--navy-50), var(--blue-50)); border: 1px solid var(--navy-100); padding: var(--space-10); text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: var(--space-4);">🔒</div>
+        <h3 style="font-size: var(--text-2xl); font-weight: 800; color: var(--navy-800); margin-bottom: var(--space-3);">¿Tienes información?</h3>
+        <p style="font-size: var(--text-base); color: var(--gray-600); max-width: 480px; margin: 0 auto var(--space-6); line-height: 1.7;">
+            Puedes enviar información anónima sobre candidatos políticos. Tu identidad está protegida y toda información se verifica antes de publicarse.
         </p>
-        {% endif %}
-        <a href="{{ url_for('candidate_detail', candidate_id=candidate.id) }}" style="margin-top: 1rem; display: inline-block;" class="btn btn-secondary">Ver Perfil Completo</a>
+        <a href="{{ url_for('submit') }}" class="btn btn-primary btn-lg">
+            Enviar Información Anónima
+        </a>
     </div>
-    {% endfor %}
-{% else %}
-    <p>No hay candidatos destacados aún. {{ total_candidates }} candidato(s) disponible(s).</p>
-{% endif %}
-
-<div style="background: #f0f5ff; padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
-    <h3 style="color: #1a365d; margin-bottom: 0.5rem;">¿Tienes información?</h3>
-    <p style="color: #555; margin-bottom: 1rem;">
-        Puedes enviar información anónima sobre candidatos políticos. Toda información se verificará antes de publicarse.
-    </p>
-    <a href="{{ url_for('submit') }}" class="btn btn-primary">Enviar Información</a>
 </div>
 {% endblock %}

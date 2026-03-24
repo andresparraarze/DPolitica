@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Editar' if candidate else 'Nuevo' }} Candidato{% endblock %}
+{% block page_title %}{{ 'Editar Candidato' if candidate else 'Nuevo Candidato' }}{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 720px;">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="name">Nombre *</label>
+                <input type="text" id="name" name="name" value="{{ candidate.name if candidate else '' }}" maxlength="200" required>
+            </div>
+            <div class="form-group">
+                <label for="party">Partido</label>
+                <input type="text" id="party" name="party" value="{{ candidate.party if candidate else '' }}" maxlength="200">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="background_summary">Resumen de Antecedentes</label>
+            <textarea id="background_summary" name="background_summary" rows="3">{{ candidate.background_summary if candidate else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="political_history">Historial Político</label>
+            <textarea id="political_history" name="political_history" rows="4">{{ candidate.political_history if candidate else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="criminal_connections">Conexiones Criminales Reportadas</label>
+            <textarea id="criminal_connections" name="criminal_connections" rows="3" style="border-color: var(--red-200);">{{ candidate.criminal_connections if candidate else '' }}</textarea>
+            <p style="font-size: 0.75rem; color: var(--gray-400); margin-top: 0.25rem;">⚠️ Esta información será marcada como no verificada judicialmente.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="funding_sources">Fuentes de Financiamiento</label>
+            <textarea id="funding_sources" name="funding_sources" rows="3">{{ candidate.funding_sources if candidate else '' }}</textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--gray-100);">
+            <button type="submit" class="btn btn-primary">{{ 'Guardar Cambios' if candidate else 'Crear Candidato' }}</button>
+            <a href="{{ url_for('admin.candidates_list') }}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

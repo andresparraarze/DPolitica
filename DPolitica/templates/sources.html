@@ -1,33 +1,44 @@
 {% extends "base.html" %}
 
-{% block title %}Fuentes - DPolitica{% endblock %}
+{% block title %}Fuentes — DPolitica{% endblock %}
 
 {% block content %}
-<h1 style="color: #1a365d; margin-bottom: 1rem;">Fuentes de Información</h1>
-<p style="color: #666; margin-bottom: 2rem;">
-    Todas las publicaciones incluyen enlaces a fuentes verificables para que puedas consultar la información original.
-</p>
+<div class="container">
+    <h1 class="section-title">Fuentes de Información</h1>
+    <p class="section-subtitle">Todas las publicaciones incluyen enlaces a fuentes verificables para que puedas consultar la información original.</p>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-    {% for source in sources %}
-    <div class="card">
-        <h3 style="color: #1a365d;">{{ source.description or 'Fuente' }}</h3>
-        <p style="color: #666;">Candidato: {{ source.candidate.name if source.candidate else 'N/A' }}</p>
-        <p style="margin-top: 0.5rem;">
-            <a href="{{ source.url }}" target="_blank" class="source-link">🔗 {{ source.url[:60] }}...</a>
-        </p>
-        <p style="font-size: 0.85rem; color: #888; margin-top: 0.5rem;">
-            Agregado: {{ source.created_at.strftime('%Y-%m-%d') }}
-        </p>
+    {% if sources %}
+    <div style="font-size: var(--text-sm); color: var(--gray-500); margin-bottom: var(--space-6);">
+        {{ sources|length }} fuente{{ 's' if sources|length != 1 }} registrada{{ 's' if sources|length != 1 }}
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--space-4);">
+        {% for source in sources %}
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); margin-bottom: var(--space-3);">
+                    <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--navy-800);">{{ source.description or 'Fuente' }}</h3>
+                    <span class="badge badge-neutral" style="flex-shrink: 0;">{{ source.source_type or 'article' }}</span>
+                </div>
+                <p style="font-size: var(--text-sm); color: var(--gray-500); margin-bottom: var(--space-2);">
+                    Candidato: <strong style="color: var(--gray-700);">{{ source.candidate.name if source.candidate else 'N/A' }}</strong>
+                </p>
+            </div>
+            <div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--gray-100); display: flex; justify-content: space-between; align-items: center;">
+                <a href="{{ source.url }}" target="_blank" rel="noopener" style="font-size: var(--text-sm); color: var(--navy-400); word-break: break-all; display: inline-flex; align-items: center; gap: var(--space-1);">
+                    🔗 {{ source.url[:60] }}{{ '...' if source.url|length > 60 }}
+                </a>
+                <span style="font-size: var(--text-xs); color: var(--gray-400); white-space: nowrap; margin-left: var(--space-3);">{{ source.created_at.strftime('%Y-%m-%d') }}</span>
+            </div>
+        </div>
+        {% endfor %}
     </div>
     {% else %}
-    <div class="card">
-        <p style="color: #666;">No hay fuentes registradas aún.</p>
+    <div class="empty-state">
+        <div class="empty-icon">📄</div>
+        <h3>No hay fuentes registradas</h3>
+        <p>Aún no se han agregado fuentes de información a la plataforma.</p>
     </div>
-    {% endfor %}
-</div>
-
-<div style="margin-top: 2rem;">
-    <a href="{{ url_for('index') }}" style="color: #3182ce;">← Volver al inicio</a>
+    {% endif %}
 </div>
 {% endblock %}

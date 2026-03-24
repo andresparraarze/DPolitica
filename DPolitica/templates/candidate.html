@@ -1,71 +1,178 @@
 {% extends "base.html" %}
 
-{% block title %}{{ candidate.name }} - DPolitica{% endblock %}
+{% block title %}{{ candidate.name }} — DPolitica{% endblock %}
 
 {% block content %}
-<h1 style="color: #1a365d;">{{ candidate.name }}</h1>
-<p style="color: #666; margin-bottom: 2rem;">Partido: {{ candidate.party or 'Independiente' }}</p>
+<div class="container">
+    <!-- Back link -->
+    <a href="{{ url_for('candidates') }}" style="display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); font-weight: 500; color: var(--gray-500); margin-bottom: var(--space-6); transition: color var(--transition);">
+        ← Volver a candidatos
+    </a>
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-    <div>
-        <div class="card">
-            <h2 style="color: #1a365d; margin-bottom: 1rem;">Antecedentes</h2>
-            <p>{{ candidate.background_summary or candidate.political_history or 'No hay información disponible' }}</p>
+    <!-- Header -->
+    <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-8);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--space-4);">
+            <div>
+                <h1 style="font-size: var(--text-3xl); font-weight: 900; color: var(--navy-800); letter-spacing: -0.02em; margin-bottom: var(--space-2);">{{ candidate.name }}</h1>
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3);">
+                    <span class="badge badge-neutral" style="font-size: var(--text-sm); padding: var(--space-1) var(--space-4);">{{ candidate.party or 'Independiente' }}</span>
+                    {% set conn_count = candidate.connections.count() %}
+                    {% if candidate.criminal_connections %}
+                    <span class="badge badge-criminal">🚨 Conexiones criminales reportadas</span>
+                    {% elif conn_count %}
+                    <span class="badge badge-warning">{{ conn_count }} conexión{{ 'es' if conn_count != 1 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1);">
+                <div class="severity-bar level-{{ [conn_count, 5]|min }}" style="gap: 4px;">
+                    <div class="seg" style="width: 6px; height: 22px;"></div>
+                    <div class="seg" style="width: 6px; height: 22px;"></div>
+                    <div class="seg" style="width: 6px; height: 22px;"></div>
+                    <div class="seg" style="width: 6px; height: 22px;"></div>
+                    <div class="seg" style="width: 6px; height: 22px;"></div>
+                </div>
+                <span style="font-size: 10px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">Nivel de riesgo</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="tab-antecedentes" onclick="switchTab('tab-antecedentes')">Antecedentes</button>
+        <button class="tab-btn" data-tab="tab-historial" onclick="switchTab('tab-historial')">Historial Político</button>
+        <button class="tab-btn" data-tab="tab-conexiones" onclick="switchTab('tab-conexiones')">Conexiones{% if conn_count %} <span class="badge badge-info" style="margin-left: 4px;">{{ conn_count }}</span>{% endif %}</button>
+        <button class="tab-btn" data-tab="tab-fuentes" onclick="switchTab('tab-fuentes')">Fuentes{% if sources %} <span class="badge badge-neutral" style="margin-left: 4px;">{{ sources|length }}</span>{% endif %}</button>
+        <button class="tab-btn" data-tab="tab-denuncias" onclick="switchTab('tab-denuncias')">Denuncias{% if submissions %} <span class="badge badge-neutral" style="margin-left: 4px;">{{ submissions|length }}</span>{% endif %}</button>
+    </div>
+
+    <!-- Tab: Antecedentes -->
+    <div id="tab-antecedentes" class="tab-panel active">
+        <div class="card" style="margin-bottom: var(--space-4);">
+            <h2 style="font-size: var(--text-lg); font-weight: 700; color: var(--navy-800); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                📋 Antecedentes
+            </h2>
+            <p style="color: var(--gray-600); line-height: 1.8;">{{ candidate.background_summary or candidate.political_history or 'No hay información disponible sobre los antecedentes de este candidato.' }}</p>
         </div>
 
         {% if candidate.criminal_connections %}
-        <div class="card" style="background: #fff5f5;">
-            <h2 style="color: #c53030; margin-bottom: 1rem;">🚨 Conexiones Criminales Reportadas</h2>
-            <p style="color: #c53030;">{{ candidate.criminal_connections }}</p>
-            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;"><em>Esta información no ha sido verificada judicialmente.</em></p>
+        <div class="card" style="background: var(--red-50); border-color: var(--red-200);">
+            <h2 style="font-size: var(--text-lg); font-weight: 700; color: var(--red-600); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                🚨 Conexiones Criminales Reportadas
+            </h2>
+            <p style="color: var(--red-700); line-height: 1.8;">{{ candidate.criminal_connections }}</p>
+            <p style="margin-top: var(--space-4); font-size: var(--text-sm); color: var(--gray-500); font-style: italic;">
+                ⚠️ Esta información no ha sido verificada judicialmente. Se presenta a partir de fuentes públicas y denuncias ciudadanas.
+            </p>
         </div>
         {% endif %}
 
         {% if candidate.funding_sources %}
-        <div class="card">
-            <h2 style="color: #1a365d; margin-bottom: 1rem;">Fuentes de Financiamiento</h2>
-            <p>{{ candidate.funding_sources }}</p>
+        <div class="card" style="margin-top: var(--space-4);">
+            <h2 style="font-size: var(--text-lg); font-weight: 700; color: var(--navy-800); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                💰 Fuentes de Financiamiento
+            </h2>
+            <p style="color: var(--gray-600); line-height: 1.8;">{{ candidate.funding_sources }}</p>
         </div>
         {% endif %}
     </div>
 
-    <div>
+    <!-- Tab: Historial Político -->
+    <div id="tab-historial" class="tab-panel">
         <div class="card">
-            <h2 style="color: #1a365d; margin-bottom: 1rem;">Historial Político</h2>
-            <p>{{ candidate.political_history or candidate.background_summary or 'No hay información disponible' }}</p>
+            <h2 style="font-size: var(--text-lg); font-weight: 700; color: var(--navy-800); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                🏛️ Historial Político
+            </h2>
+            <p style="color: var(--gray-600); line-height: 1.8;">{{ candidate.political_history or candidate.background_summary or 'No hay información disponible sobre el historial político de este candidato.' }}</p>
         </div>
+    </div>
 
+    <!-- Tab: Conexiones -->
+    <div id="tab-conexiones" class="tab-panel">
         {% if connections %}
-        <div class="card">
-            <h2 style="color: #1a365d; margin-bottom: 1rem;">Conexiones y Asociaciones</h2>
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
             {% for conn in connections %}
-            <div style="padding: 0.75rem; border-bottom: 1px solid #eee;">
-                <span class="badge badge-{{ 'criminal' if 'criminal' in conn.connection_type or 'narcos' in conn.connection_type else 'unverified' }}">{{ conn.connection_type }}</span>
-                <strong>{{ conn.organization or 'Desconocida' }}</strong>
-                <p style="color: #666; font-size: 0.9rem;">{{ conn.description }}</p>
+            <div class="card" style="display: grid; grid-template-columns: auto 1fr; gap: var(--space-4); align-items: start;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--text-sm);
+                    {% if conn.connection_type in ('criminal_organization', 'narcotics') %}background: var(--red-100);{% else %}background: var(--gray-100);{% endif %}">
+                    {% if conn.connection_type in ('criminal_organization', 'narcotics') %}🚨{% elif conn.connection_type == 'financial_backer' %}💰{% elif conn.connection_type == 'family_member' %}👨‍👩‍👧{% elif conn.connection_type == 'business_partner' %}🤝{% else %}🔗{% endif %}
+                </div>
+                <div>
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
+                        <span class="badge badge-{{ 'criminal' if conn.connection_type in ('criminal_organization', 'narcotics') else 'neutral' }}">{{ conn.connection_type }}</span>
+                        {% if conn.verified %}
+                        <span class="badge badge-verified">✓ Verificado</span>
+                        {% endif %}
+                    </div>
+                    <h4 style="font-size: var(--text-base); font-weight: 600; color: var(--navy-800); margin-bottom: var(--space-1);">{{ conn.organization or 'Desconocida' }}</h4>
+                    <p style="font-size: var(--text-sm); color: var(--gray-500); line-height: 1.6;">{{ conn.description }}</p>
+                </div>
             </div>
             {% endfor %}
         </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🔗</div>
+            <h3>Sin conexiones registradas</h3>
+            <p>No se han reportado conexiones para este candidato.</p>
+        </div>
         {% endif %}
     </div>
-</div>
 
-{% if submissions %}
-<div class="card" style="margin-top: 2rem;">
-    <h2 style="color: #1a365d; margin-bottom: 1rem;">Información Verificada</h2>
-    {% for sub in submissions %}
-    <div style="padding: 1rem; border-bottom: 1px solid #eee;">
-        <p>{{ sub.content }}</p>
-        {% if sub.source_link %}
-        <a href="{{ sub.source_link }}" target="_blank" class="source-link">🔗 Fuente: {{ sub.source_link[:50] }}...</a>
+    <!-- Tab: Fuentes -->
+    <div id="tab-fuentes" class="tab-panel">
+        {% if sources %}
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+            {% for src in sources %}
+            <div class="card" style="padding: var(--space-4) var(--space-5);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4);">
+                    <div>
+                        <p style="font-size: var(--text-sm); font-weight: 600; color: var(--navy-700); margin-bottom: var(--space-1);">{{ src.description or 'Fuente' }}</p>
+                        <span class="badge badge-neutral">{{ src.source_type or 'article' }}</span>
+                    </div>
+                    <span style="font-size: var(--text-xs); color: var(--gray-400); white-space: nowrap;">{{ src.created_at.strftime('%Y-%m-%d') }}</span>
+                </div>
+                <a href="{{ src.url }}" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); font-size: var(--text-sm); color: var(--navy-400); word-break: break-all;">
+                    🔗 {{ src.url[:70] }}{{ '...' if src.url|length > 70 }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📄</div>
+            <h3>Sin fuentes registradas</h3>
+            <p>No se han añadido fuentes de información para este candidato.</p>
+        </div>
         {% endif %}
-        <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">Verificado: {{ sub.created_at.strftime('%Y-%m-%d') }}</p>
     </div>
-    {% endfor %}
-</div>
-{% endif %}
 
-<div style="margin-top: 2rem;">
-    <a href="{{ url_for('candidates') }}" style="color: #3182ce;">← Volver a lista de candidatos</a>
+    <!-- Tab: Denuncias -->
+    <div id="tab-denuncias" class="tab-panel">
+        {% if submissions %}
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+            {% for sub in submissions %}
+            <div class="card" style="padding: var(--space-5);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+                    <span class="badge badge-verified">✓ Verificado</span>
+                    <span style="font-size: var(--text-xs); color: var(--gray-400);">{{ sub.created_at.strftime('%Y-%m-%d') }}</span>
+                </div>
+                <p style="color: var(--gray-700); line-height: 1.7;">{{ sub.content }}</p>
+                {% if sub.source_link %}
+                <a href="{{ sub.source_link }}" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); font-size: var(--text-sm); color: var(--navy-400); word-break: break-all;">
+                    🔗 {{ sub.source_link[:60] }}{{ '...' if sub.source_link|length > 60 }}
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>Sin denuncias verificadas</h3>
+            <p>No hay denuncias verificadas para este candidato. <a href="{{ url_for('submit') }}">¿Tienes información?</a></p>
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

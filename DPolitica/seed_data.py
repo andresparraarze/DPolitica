@@ -99,13 +99,6 @@ def seed_data():
         db.session.commit()
         print(f'Created {Submission.query.count()} submissions')
 
-        # Update candidate stats
-        for candidate in all_candidates:
-            candidate.connection_count = Connection.query.filter_by(candidate_id=candidate.id).count()
-
-        db.session.commit()
-        print('Updated candidate connection counts')
-
         print('\n=== Data seeded successfully ===')
         print(f'Total candidates: {Candidate.query.count()}')
         print(f'Total sources: {Source.query.count()}')

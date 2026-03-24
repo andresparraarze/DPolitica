@@ -1,0 +1,62 @@
+{% extends "admin/base.html" %}
+{% block title %}Panel{% endblock %}
+{% block page_title %}Panel de Administración{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="stats-row">
+    <div class="card stat-card">
+        <div class="number">{{ pending }}</div>
+        <div class="label">Denuncias Pendientes</div>
+    </div>
+    <div class="card stat-card">
+        <div class="number">{{ under_review }}</div>
+        <div class="label">En Revisión</div>
+    </div>
+    <div class="card stat-card">
+        <div class="number">{{ total_candidates }}</div>
+        <div class="label">Candidatos</div>
+    </div>
+    <div class="card stat-card">
+        <div class="number">{{ unverified_connections }}</div>
+        <div class="label">Conexiones Sin Verificar</div>
+    </div>
+    <div class="card stat-card">
+        <div class="number">{{ total_sources }}</div>
+        <div class="label">Fuentes</div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card" style="margin-bottom: 1.5rem;">
+    <div class="section-header">
+        <h2>Acciones Rápidas</h2>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <a href="{{ url_for('admin.submissions', status='pending') }}" class="btn btn-primary">📝 Ver Denuncias Pendientes</a>
+        <a href="{{ url_for('admin.candidate_new') }}" class="btn btn-secondary">👤 Nuevo Candidato</a>
+        <a href="{{ url_for('admin.connections_list') }}" class="btn btn-secondary">🔗 Gestionar Conexiones</a>
+        <a href="{{ url_for('admin.sources_list') }}" class="btn btn-secondary">📄 Gestionar Fuentes</a>
+    </div>
+</div>
+
+<!-- Recent Activity Log -->
+<div class="card">
+    <div class="section-header">
+        <h2>Actividad Reciente</h2>
+    </div>
+    {% if recent_logs %}
+    <ul class="log-list">
+        {% for log in recent_logs %}
+        <li>
+            <span class="log-time">{{ log.created_at.strftime('%d/%m %H:%M') }}</span>
+            <span class="log-action">{{ log.action }}</span>
+            <span>{{ log.details }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p style="color: var(--gray-400); font-size: 0.85rem;">No hay actividad registrada aún.</p>
+    {% endif %}
+</div>
+{% endblock %}

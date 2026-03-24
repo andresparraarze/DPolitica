@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+{% block title %}Denuncias{% endblock %}
+{% block page_title %}Gestión de Denuncias{% endblock %}
+
+{% block content %}
+<!-- Status filter tabs -->
+<div style="display: flex; gap: 0.25rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+    {% for s in ['pending', 'under_review', 'verified', 'rejected', 'all'] %}
+    <a href="{{ url_for('admin.submissions', status=s) }}"
+       class="btn {{ 'btn-primary' if status_filter == s else 'btn-secondary' }} btn-sm">
+        {{ {'pending':'Pendientes','under_review':'En Revisión','verified':'Verificadas','rejected':'Rechazadas','all':'Todas'}[s] }}
+    </a>
+    {% endfor %}
+</div>
+
+{% if submissions %}
+<div style="display: flex; flex-direction: column; gap: 1rem;">
+    {% for sub in submissions %}
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <strong style="color: var(--navy-700);">#{{ sub.id }}</strong>
+                <span class="badge badge-{{ 'pending' if sub.verification_status == 'pending' else 'review' if sub.verification_status == 'under_review' else 'verified' if sub.verification_status == 'verified' else 'rejected' if sub.verification_status == 'rejected' else 'neutral' }}">
+                    {{ sub.verification_status }}
+                </span>
+                <span class="badge badge-neutral">{{ sub.source_type }}</span>
+                {% if sub.is_anonymous %}<span class="badge badge-neutral">🔒 Anónimo</span>{% endif %}
+            </div>
+            <span style="font-size: 0.75rem; color: var(--gray-400);">{{ sub.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        </div>
+
+        {% if sub.candidate %}
+        <p style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.5rem;">Candidato: <strong style="color: var(--navy-700);">{{ sub.candidate.name }}</strong></p>
+        {% endif %}
+
+        <p style="font-size: 0.9rem; color: var(--gray-700); line-height: 1.6; margin-bottom: 0.75rem;">{{ sub.content }}</p>
+
+        {% if sub.source_link %}
+        <p style="font-size: 0.8rem; margin-bottom: 0.75rem;">
+            <a href="{{ sub.source_link }}" target="_blank" style="color: var(--navy-400);">🔗 {{ sub.source_link[:60] }}{{ '...' if sub.source_link|length > 60 }}</a>
+        </p>
+        {% endif %}
+
+        {% if sub.verification_notes %}
+        <div style="background: var(--gray-50); padding: 0.5rem 0.75rem; border-radius: 6px; margin-bottom: 0.75rem; font-size: 0.8rem;">
+            <strong>Notas:</strong> {{ sub.verification_notes }}
+        </div>
+        {% endif %}
+
+        <!-- Update form -->
+        <form method="POST" action="{{ url_for('admin.update_submission', sub_id=sub.id, status=status_filter) }}" style="display: flex; gap: 0.5rem; align-items: flex-end; flex-wrap: wrap; padding-top: 0.75rem; border-top: 1px solid var(--gray-100);">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
+                <label>Estado</label>
+                <select name="status" style="min-width: 150px;">
+                    {% for st in ['pending', 'under_review', 'verified', 'rejected', 'partially_verified'] %}
+                    <option value="{{ st }}" {{ 'selected' if sub.verification_status == st }}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                <label>Notas de verificación</label>
+                <input type="text" name="notes" value="{{ sub.verification_notes or '' }}" placeholder="Añadir nota...">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Actualizar</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem; color: var(--gray-400);">
+    <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">📭</p>
+    <p>No hay denuncias con este filtro.</p>
+</div>
+{% endif %}
+{% endblock %}

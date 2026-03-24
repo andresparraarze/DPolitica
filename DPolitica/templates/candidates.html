@@ -1,49 +1,93 @@
 {% extends "base.html" %}
 
-{% block title %}Candidatos - DPolitica{% endblock %}
+{% block title %}Candidatos — DPolitica{% endblock %}
 
 {% block content %}
-<h1 style="color: #1a365d; margin-bottom: 1rem;">Candidatos Políticos</h1>
-<p style="color: #666; margin-bottom: 2rem;">Busca y revisa información sobre candidatos políticos bolivianos</p>
+<div class="container">
+    <h1 class="section-title">Candidatos Políticos</h1>
+    <p class="section-subtitle">Busca y revisa información sobre candidatos políticos bolivianos</p>
 
-<div class="search-form">
-    <input type="text" placeholder="Buscar por nombre..." value="{{ search }}" name="search">
-    <input type="text" placeholder="Partido político..." value="{{ party }}" name="party">
-    <select name="connections">
-        <option value="">Todas las conexiones</option>
-        <option value="0">0+ conexiones</option>
-        <option value="1">1+ conexiones</option>
-        <option value="2">2+ conexiones</option>
-        <option value="3">3+ conexiones</option>
-    </select>
-    <button class="btn btn-primary" onclick="this.form.submit()">Buscar</button>
-</div>
+    <!-- Search & Filters -->
+    <form method="GET" action="{{ url_for('candidates') }}" class="card" style="padding: var(--space-4) var(--space-5); display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; margin-bottom: var(--space-8);">
+        <div style="flex: 2; min-width: 180px;">
+            <label style="display: block; font-size: var(--text-xs); font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-1);">Nombre</label>
+            <input type="text" name="search" value="{{ search }}" placeholder="Buscar por nombre..." style="width: 100%; padding: var(--space-2) var(--space-3); border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: var(--text-sm); font-family: var(--font); outline: none;">
+        </div>
+        <div style="flex: 1; min-width: 140px;">
+            <label style="display: block; font-size: var(--text-xs); font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-1);">Partido</label>
+            <input type="text" name="party" value="{{ party }}" placeholder="Partido..." style="width: 100%; padding: var(--space-2) var(--space-3); border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: var(--text-sm); font-family: var(--font); outline: none;">
+        </div>
+        <div style="flex: 0 0 auto; min-width: 140px;">
+            <label style="display: block; font-size: var(--text-xs); font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-1);">Conexiones</label>
+            <select name="connections" style="width: 100%; padding: var(--space-2) var(--space-3); border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: var(--text-sm); font-family: var(--font); outline: none; background: var(--white);">
+                <option value="">Todas</option>
+                <option value="0" {{ 'selected' if min_connections == 0 }}>0+</option>
+                <option value="1" {{ 'selected' if min_connections == 1 }}>1+</option>
+                <option value="2" {{ 'selected' if min_connections == 2 }}>2+</option>
+                <option value="3" {{ 'selected' if min_connections == 3 }}>3+</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="flex: 0 0 auto;">
+            Buscar
+        </button>
+    </form>
 
-{% if candidates %}
-    {% for candidate in candidates %}
-    <div class="card candidate-card">
-        <div class="candidate-info">
-            <h3>{{ candidate.name }}</h3>
-            <p><strong>Partido:</strong> {{ candidate.party or 'Independiente' }}</p>
-            <p>{{ candidate.background_summary or 'Sin resumen disponible' }}</p>
-            {% if candidate.connection_count %}
-            <div style="margin-top: 0.5rem;">
+    <!-- Results -->
+    {% if candidates %}
+    <div style="font-size: var(--text-sm); color: var(--gray-500); margin-bottom: var(--space-4);">
+        {{ candidates|length }} candidato{{ 's' if candidates|length != 1 }} encontrado{{ 's' if candidates|length != 1 }}
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+        {% for candidate in candidates %}
+        {% set conn_count = candidate.connections.count() %}
+        <a href="{{ url_for('candidate_detail', candidate_id=candidate.id) }}" class="card" style="display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-5); align-items: center; text-decoration: none; color: inherit; padding: var(--space-5);">
+            <!-- Severity Indicator -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1);">
                 {% if candidate.criminal_connections %}
-                <span class="badge badge-criminal">Conexiones criminales reportadas</span>
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--red-100); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">🚨</div>
+                {% elif conn_count >= 3 %}
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--amber-100); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">⚠️</div>
+                {% elif conn_count >= 1 %}
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--blue-100); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">ℹ️</div>
                 {% else %}
-                <span class="badge badge-unverified">{{ candidate.connection_count }} conexiones</span>
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">👤</div>
                 {% endif %}
             </div>
-            {% endif %}
-        </div>
-        <div class="candidate-actions">
-            <a href="{{ url_for('candidate_detail', candidate_id=candidate.id) }}" class="btn btn-primary">Ver Perfil</a>
-        </div>
+
+            <!-- Info -->
+            <div>
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
+                    <h3 style="font-size: var(--text-base); font-weight: 700; color: var(--navy-800);">{{ candidate.name }}</h3>
+                    <span class="badge badge-neutral">{{ candidate.party or 'Independiente' }}</span>
+                </div>
+                <p style="font-size: var(--text-sm); color: var(--gray-500); line-height: 1.5;">{{ candidate.background_summary or 'Sin resumen disponible' }}</p>
+                <div style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2);">
+                    {% if candidate.criminal_connections %}
+                    <span class="badge badge-criminal">Conexiones criminales</span>
+                    {% endif %}
+                    {% if conn_count %}
+                    <span class="badge badge-info">{{ conn_count }} conexión{{ 'es' if conn_count != 1 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Severity Bar -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1);">
+                <div class="severity-bar level-{{ [conn_count, 5]|min }}">
+                    <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+                </div>
+                <span style="font-size: 10px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.05em;">riesgo</span>
+            </div>
+        </a>
+        {% endfor %}
     </div>
-    {% endfor %}
-{% else %}
-    <div class="card">
-        <p style="color: #666;">No se encontraron candidatos. Intenta con otra búsqueda.</p>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>No se encontraron candidatos</h3>
+        <p>Intenta con otra búsqueda o revisa los filtros aplicados.</p>
     </div>
-{% endif %}
+    {% endif %}
+</div>
 {% endblock %}

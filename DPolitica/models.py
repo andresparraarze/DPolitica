@@ -22,8 +22,10 @@ class Candidate(db.Model):
     criminal_connections = db.Column(db.Text)  # Alleged criminal ties
     funding_sources = db.Column(db.Text)  # Who funds them
 
-    # Connection count for quick stats
-    connection_count = db.Column(db.Integer, default=0)
+    @property
+    def connection_count(self):
+        """Live count from the connections relationship."""
+        return self.connections.count()
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -104,3 +106,19 @@ class Submission(db.Model):
 
     def __repr__(self):
         return f'<Submission {self.verification_status}: {self.content[:50]}>'
+
+
+class AdminLog(db.Model):
+    """Log of all admin actions"""
+
+    __tablename__ = 'admin_logs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    action = db.Column(db.String(100), nullable=False)  # e.g. 'candidate_created', 'submission_verified'
+    details = db.Column(db.Text)  # Human-readable description
+    target_type = db.Column(db.String(50))  # 'candidate', 'submission', 'connection', 'source'
+    target_id = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<AdminLog {self.action} at {self.created_at}>'

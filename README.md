@@ -160,6 +160,76 @@ Get detailed information about a specific candidate.
 - **Source**: References (articles, reports, etc.)
 - **Submission**: User-submitted tips and evidence
 
+## Despliegue en Railway.app
+
+Guía paso a paso para desplegar DPolitica en [Railway](https://railway.app) de forma gratuita.
+
+### Requisitos Previos
+
+- Cuenta en [Railway.app](https://railway.app)
+- Repositorio Git con el código de DPolitica
+
+### Paso 1: Crear un Proyecto en Railway
+
+1. Inicia sesión en [Railway](https://railway.app)
+2. Haz clic en **"New Project"** → **"Deploy from GitHub Repo"**
+3. Conecta tu cuenta de GitHub y selecciona el repositorio
+4. Railway detectará automáticamente que es una app Python
+
+### Paso 2: Agregar una Base de Datos PostgreSQL
+
+1. Dentro de tu proyecto, haz clic en **"+ New"** → **"Database"** → **"Add PostgreSQL"**
+2. Railway creará una instancia de PostgreSQL y establecerá la variable `DATABASE_URL` automáticamente
+
+### Paso 3: Configurar Variables de Entorno
+
+En la pestaña **"Variables"** de tu servicio, agrega las siguientes variables:
+
+| Variable | Descripción | Ejemplo |
+|---|---|---|
+| `SECRET_KEY` | Clave secreta para Flask (generar una larga y aleatoria) | `python3 -c "import secrets; print(secrets.token_hex(32))"` |
+| `ADMIN_PASSWORD` | Contraseña del panel de administración | `mi-contraseña-segura` |
+| `FLASK_ENV` | Modo de ejecución | `production` |
+| `DATABASE_URL` | URL de PostgreSQL (automática si usas Railway PostgreSQL) | *(se configura sola)* |
+| `API_KEY` | Clave para la API REST (opcional) | `python3 -c "import secrets; print(secrets.token_hex(16))"` |
+
+> **⚠️ Importante:** Nunca uses valores por defecto en producción. Genera claves aleatorias con `python3 -c "import secrets; print(secrets.token_hex(32))"`.
+
+### Paso 4: Configurar el Root Directory
+
+Si el directorio `DPolitica/` no está en la raíz del repositorio:
+
+1. Ve a **Settings** → **Root Directory**
+2. Establece la ruta como `DPolitica`
+
+### Paso 5: Desplegar
+
+Railway desplegará automáticamente al recibir un push a la rama principal. Puedes verificar el estado en:
+
+- **Dashboard** → tu servicio → **Deployments**
+- El endpoint `/health` debe devolver `{"status": "ok"}`
+
+### Archivos de Configuración
+
+| Archivo | Descripción |
+|---|---|
+| `Procfile` | Define el comando de inicio: `gunicorn app:app` |
+| `railway.toml` | Configuración de Railway: health check en `/health` |
+| `requirements.txt` | Dependencias de Python incluyendo `gunicorn` y `psycopg2-binary` |
+
+### Desarrollo Local
+
+Para desarrollo local, la app usa SQLite automáticamente cuando `DATABASE_URL` no está definida:
+
+```bash
+cd DPolitica
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+# Abrir http://localhost:5000
+```
+
 ## License
 
 MIT License
