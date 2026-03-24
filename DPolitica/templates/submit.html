@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Enviar Información - DPolitica{% endblock %}
+
+{% block content %}
+<h1 style="color: #1a365d; margin-bottom: 1rem;">Enviar Información Anónima</h1>
+<p style="color: #666; margin-bottom: 2rem;">
+    ¿Tienes información sobre un candidato político? Envíanos tus denuncias de forma anónima.
+    Toda información será verificada antes de publicarse.
+</p>
+
+<div class="card" style="max-width: 600px;">
+    <form method="POST" action="{{ url_for('submit') }}">
+        <div class="form-group">
+            <label for="candidate_name">Nombre del Candidato (opcional)</label>
+            <input type="text" id="candidate_name" name="candidate_name" placeholder="Ej: Juan Pérez">
+        </div>
+
+        <div class="form-group">
+            <label for="source_type">Tipo de Información</label>
+            <select id="source_type" name="source_type">
+                <option value="tip">Denuncia</option>
+                <option value="evidence">Evidencia (fotografías, documentos)</option>
+                <option value="document">Documento Oficial</option>
+                <option value="video">Video/Grabación</option>
+                <option value="witness">Testimonio</option>
+                <option value="other">Otro</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="source_link">Enlace a Fuente (opcional)</label>
+            <input type="text" id="source_link" name="source_link" placeholder="https://..." >
+            <p style="font-size: 0.85rem; color: #666; margin-top: 0.25rem;">
+                Si tienes un enlace a noticias, documentos oficiales, etc., inclúyelo aquí.
+            </p>
+        </div>
+
+        <div class="form-group">
+            <label for="content">Información</label>
+            <textarea id="content" name="content" placeholder="Describe la información que deseas compartir. Sé lo más específico posible..."></textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: flex-start; gap: 0.5rem;">
+            <input type="checkbox" id="anonymous" name="anonymous" checked style="margin-top: 0.25rem;">
+            <label for="anonymous" style="font-weight: normal;">
+                Mantener esta denuncia anónima
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enviar Denuncia</button>
+    </form>
+</div>
+
+<div style="margin-top: 2rem; padding: 1rem; background: #f0f5ff; border-radius: 8px;">
+    <h3 style="color: #1a365d; margin-bottom: 0.5rem;">🔒 Privacidad y Seguridad</h3>
+    <ul style="color: #555; margin-left: 1.5rem; line-height: 1.8;">
+        <li>Tu identidad permanecerá anónima si así lo deseas</li>
+        <li>Toda información será verificada antes de publicarse</li>
+        <li>No publicaremos tu denuncia hasta que hayamos confirmado la información</li>
+        <li>Usa navegación segura si temes represalias</li>
+    </ul>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{{ url_for('index') }}" style="color: #3182ce;">← Volver al inicio</a>
+</div>
+{% endblock %}

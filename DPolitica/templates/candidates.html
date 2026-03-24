@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Candidatos - DPolitica{% endblock %}
+
+{% block content %}
+<h1 style="color: #1a365d; margin-bottom: 1rem;">Candidatos Políticos</h1>
+<p style="color: #666; margin-bottom: 2rem;">Busca y revisa información sobre candidatos políticos bolivianos</p>
+
+<div class="search-form">
+    <input type="text" placeholder="Buscar por nombre..." value="{{ search }}" name="search">
+    <input type="text" placeholder="Partido político..." value="{{ party }}" name="party">
+    <select name="connections">
+        <option value="">Todas las conexiones</option>
+        <option value="0">0+ conexiones</option>
+        <option value="1">1+ conexiones</option>
+        <option value="2">2+ conexiones</option>
+        <option value="3">3+ conexiones</option>
+    </select>
+    <button class="btn btn-primary" onclick="this.form.submit()">Buscar</button>
+</div>
+
+{% if candidates %}
+    {% for candidate in candidates %}
+    <div class="card candidate-card">
+        <div class="candidate-info">
+            <h3>{{ candidate.name }}</h3>
+            <p><strong>Partido:</strong> {{ candidate.party or 'Independiente' }}</p>
+            <p>{{ candidate.background_summary or 'Sin resumen disponible' }}</p>
+            {% if candidate.connection_count %}
+            <div style="margin-top: 0.5rem;">
+                {% if candidate.criminal_connections %}
+                <span class="badge badge-criminal">Conexiones criminales reportadas</span>
+                {% else %}
+                <span class="badge badge-unverified">{{ candidate.connection_count }} conexiones</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        <div class="candidate-actions">
+            <a href="{{ url_for('candidate_detail', candidate_id=candidate.id) }}" class="btn btn-primary">Ver Perfil</a>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="card">
+        <p style="color: #666;">No se encontraron candidatos. Intenta con otra búsqueda.</p>
+    </div>
+{% endif %}
+{% endblock %}

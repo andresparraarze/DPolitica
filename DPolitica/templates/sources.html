@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Fuentes - DPolitica{% endblock %}
+
+{% block content %}
+<h1 style="color: #1a365d; margin-bottom: 1rem;">Fuentes de Información</h1>
+<p style="color: #666; margin-bottom: 2rem;">
+    Todas las publicaciones incluyen enlaces a fuentes verificables para que puedas consultar la información original.
+</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
+    {% for source in sources %}
+    <div class="card">
+        <h3 style="color: #1a365d;">{{ source.description or 'Fuente' }}</h3>
+        <p style="color: #666;">Candidato: {{ source.candidate.name if source.candidate else 'N/A' }}</p>
+        <p style="margin-top: 0.5rem;">
+            <a href="{{ source.url }}" target="_blank" class="source-link">🔗 {{ source.url[:60] }}...</a>
+        </p>
+        <p style="font-size: 0.85rem; color: #888; margin-top: 0.5rem;">
+            Agregado: {{ source.created_at.strftime('%Y-%m-%d') }}
+        </p>
+    </div>
+    {% else %}
+    <div class="card">
+        <p style="color: #666;">No hay fuentes registradas aún.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{{ url_for('index') }}" style="color: #3182ce;">← Volver al inicio</a>
+</div>
+{% endblock %}

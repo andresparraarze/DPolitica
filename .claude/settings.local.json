@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m venv venv)",
+      "Bash(source venv/bin/activate)",
+      "Bash(pip install:*)",
+      "Bash(timeout 5 python app.py)",
+      "Bash(python -c \":*)",
+      "Bash(python seed_data.py)",
+      "Bash(python tests.py)"
+    ]
+  }
+}

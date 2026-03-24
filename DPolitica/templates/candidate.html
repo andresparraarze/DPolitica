@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ candidate.name }} - DPolitica{% endblock %}
+
+{% block content %}
+<h1 style="color: #1a365d;">{{ candidate.name }}</h1>
+<p style="color: #666; margin-bottom: 2rem;">Partido: {{ candidate.party or 'Independiente' }}</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div>
+        <div class="card">
+            <h2 style="color: #1a365d; margin-bottom: 1rem;">Antecedentes</h2>
+            <p>{{ candidate.background_summary or candidate.political_history or 'No hay información disponible' }}</p>
+        </div>
+
+        {% if candidate.criminal_connections %}
+        <div class="card" style="background: #fff5f5;">
+            <h2 style="color: #c53030; margin-bottom: 1rem;">🚨 Conexiones Criminales Reportadas</h2>
+            <p style="color: #c53030;">{{ candidate.criminal_connections }}</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;"><em>Esta información no ha sido verificada judicialmente.</em></p>
+        </div>
+        {% endif %}
+
+        {% if candidate.funding_sources %}
+        <div class="card">
+            <h2 style="color: #1a365d; margin-bottom: 1rem;">Fuentes de Financiamiento</h2>
+            <p>{{ candidate.funding_sources }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <div class="card">
+            <h2 style="color: #1a365d; margin-bottom: 1rem;">Historial Político</h2>
+            <p>{{ candidate.political_history or candidate.background_summary or 'No hay información disponible' }}</p>
+        </div>
+
+        {% if connections %}
+        <div class="card">
+            <h2 style="color: #1a365d; margin-bottom: 1rem;">Conexiones y Asociaciones</h2>
+            {% for conn in connections %}
+            <div style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+                <span class="badge badge-{{ 'criminal' if 'criminal' in conn.connection_type or 'narcos' in conn.connection_type else 'unverified' }}">{{ conn.connection_type }}</span>
+                <strong>{{ conn.organization or 'Desconocida' }}</strong>
+                <p style="color: #666; font-size: 0.9rem;">{{ conn.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if submissions %}
+<div class="card" style="margin-top: 2rem;">
+    <h2 style="color: #1a365d; margin-bottom: 1rem;">Información Verificada</h2>
+    {% for sub in submissions %}
+    <div style="padding: 1rem; border-bottom: 1px solid #eee;">
+        <p>{{ sub.content }}</p>
+        {% if sub.source_link %}
+        <a href="{{ sub.source_link }}" target="_blank" class="source-link">🔗 Fuente: {{ sub.source_link[:50] }}...</a>
+        {% endif %}
+        <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">Verificado: {{ sub.created_at.strftime('%Y-%m-%d') }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div style="margin-top: 2rem;">
+    <a href="{{ url_for('candidates') }}" style="color: #3182ce;">← Volver a lista de candidatos</a>
+</div>
+{% endblock %}

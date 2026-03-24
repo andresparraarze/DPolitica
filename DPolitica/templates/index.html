@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}DPolitica - Transparencia Política Bolivia{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 2rem;">
+    <h1 style="color: #1a365d; font-size: 2.5rem; margin-bottom: 1rem;">DPolitica</h1>
+    <h2 style="color: #666; font-size: 1.5rem; margin-bottom: 2rem;">Transparencia Política para Bolivia</h2>
+    <p style="max-width: 700px; margin: 0 auto 2rem; font-size: 1.1rem; color: #555;">
+        Accede a información verificada sobre candidatos políticos bolivianos:
+        antecedentes, conexiones criminales, financiamiento y más.
+        Conoce el verdadero pasado de quienes buscan el poder.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{{ url_for('candidates') }}" class="btn btn-primary">Ver Candidatos</a>
+        <a href="{{ url_for('submit') }}" class="btn btn-secondary">Enviar Información Anónima</a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_candidates }}</div>
+        <div class="stat-label">Candidatos Registrados</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_submissions }}</div>
+        <div class="stat-label">Denuncias Recibidas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ verified_submissions }}</div>
+        <div class="stat-label">Información Verificada</div>
+    </div>
+</div>
+
+<h2 style="color: #1a365d; margin: 2rem 0 1rem;">Candidatos Destacados</h2>
+
+{% if featured %}
+    {% for candidate in featured %}
+    <div class="card">
+        <h3 style="color: #1a365d;">{{ candidate.name }}</h3>
+        <p style="color: #666;">Partido: {{ candidate.party or 'Independiente' }}</p>
+        <p style="margin-top: 0.5rem;">{{ candidate.background_summary or 'Sin resumen disponible' }}</p>
+        {% if candidate.connection_count %}
+        <p style="margin-top: 0.5rem;">
+            <span class="badge badge-unverified">{{ candidate.connection_count }} conexiones reportadas</span>
+        </p>
+        {% endif %}
+        <a href="{{ url_for('candidate_detail', candidate_id=candidate.id) }}" style="margin-top: 1rem; display: inline-block;" class="btn btn-secondary">Ver Perfil Completo</a>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No hay candidatos destacados aún. {{ total_candidates }} candidato(s) disponible(s).</p>
+{% endif %}
+
+<div style="background: #f0f5ff; padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
+    <h3 style="color: #1a365d; margin-bottom: 0.5rem;">¿Tienes información?</h3>
+    <p style="color: #555; margin-bottom: 1rem;">
+        Puedes enviar información anónima sobre candidatos políticos. Toda información se verificará antes de publicarse.
+    </p>
+    <a href="{{ url_for('submit') }}" class="btn btn-primary">Enviar Información</a>
+</div>
+{% endblock %}
